@@ -7,7 +7,7 @@ const todoService = new TodoService();
 export const createTodo = async (req: Request, res: Response) => {
   try {
     const { title } = createTodoSchema.parse(req.body);
-    const userId = (req as any).userId;
+    const userId = req.user!.id;
 
     const todo = await todoService.create(title, userId);
     res.status(201).json(todo);
@@ -22,7 +22,7 @@ export const createTodo = async (req: Request, res: Response) => {
 
 
 export const getTodos = async (req: Request, res: Response) => {
-  const userId = (req as any).userId;
+  const userId = req.user!.id;
 
   const todos = await todoService.getAll(userId);
   res.json(todos);
@@ -32,7 +32,7 @@ export const updateTodo = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     const { completed } = updateTodoSchema.parse(req.body);
-    const userId = (req as any).userId;
+    const userId = req.user!.id;
 
     await todoService.update(id, userId, completed);
     res.json({ message: "Updated" });
@@ -47,7 +47,7 @@ export const updateTodo = async (req: Request, res: Response) => {
 
 export const deleteTodo = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
-  const userId = (req as any).userId;
+  const userId = req.user!.id;
 
   await todoService.delete(id, userId);
   res.json({ message: "Deleted" });

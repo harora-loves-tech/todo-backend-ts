@@ -29,7 +29,7 @@ export const authMiddleware = (
     ) as JwtPayload;
 
     // attach userId to request
-    (req as any).userId = decoded.userId;
+    req.user = { id: decoded.userId };
 
     next();
   } catch (error) {
