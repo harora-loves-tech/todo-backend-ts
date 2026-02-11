@@ -6,11 +6,12 @@ import { AppError } from "../utils/app-error";
 type GetTodosOptions = {
     page: number;
     limit: number;
-    completed?: boolean;
-    search?: string;
+    completed?: boolean | undefined;
+    search?: string | undefined;
   };
 
 export class TodoService {
+  
   async create(userId: number, title: string) {
     try {
       const todoCount = await prisma.todo.count({

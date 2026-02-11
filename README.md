@@ -1,113 +1,58 @@
-# 📝 Todo Backend API
+# 📝 Todo API Backend
 
-A production-ready backend for a Todo application built with **TypeScript**, **Express**, **PostgreSQL**, and **Prisma**. The project includes user authentication using **JWT**, secure password hashing, and user-scoped Todo CRUD APIs.
+A production‑grade **Todo application backend** built with **TypeScript**, **Express**, **PostgreSQL**, and **Prisma**.
+This project follows clean architecture principles with strict typing, centralized error handling, and scalable patterns.
 
 ---
 
 ## 🚀 Tech Stack
 
-* **Node.js**
-* **TypeScript**
-* **Express**
+* **TypeScript** (strict mode enabled)
+* **Node.js + Express**
 * **PostgreSQL**
-* **Prisma ORM (with pg adapter)**
-* **JWT (jsonwebtoken)**
-* **bcrypt**
+* **Prisma ORM (v7)** with PG adapter
+* **JWT Authentication** (`jsonwebtoken`)
+* **Zod** for request validation
+* **bcrypt** for password hashing
 
 ---
 
 ## 📁 Project Structure
 
 ```
-.
+root
 ├── prisma
 │   ├── schema.prisma
-│   ├── migrations
-│   └── client.ts
+│   └── migrations
+│
 ├── src
 │   ├── app.ts
 │   ├── controllers
 │   ├── routes
 │   ├── services
 │   ├── middlewares
-│   ├── db
-│   │   └── prisma.ts
+│   ├── validators
 │   └── utils
-├── .env.example
-├── package.json
+│
 ├── tsconfig.json
+├── package.json
 └── README.md
 ```
 
 ---
 
-## ⚙️ Setup Instructions
+## 🧠 Architecture Principles
 
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/<your-username>/todo-backend.git
-cd todo-backend
-```
-
-### 2️⃣ Install Dependencies
-
-```bash
-npm install
-```
-
-### 3️⃣ Environment Variables
-
-Create a `.env` file using the example:
-
-```bash
-cp .env.example .env
-```
-
-Update values inside `.env`:
-
-```env
-DATABASE_URL=postgresql://user:password@localhost:5432/todo
-JWT_SECRET=your_secret_key
-PORT=4000
-```
+* **Thin controllers** – no business logic
+* **Services own domain rules**
+* **Centralized error handling** using `AppError`
+* **No try/catch noise** in controllers (`asyncHandler`)
+* **Strict typing** (`exactOptionalPropertyTypes: true`)
+* **Validation first** using Zod
 
 ---
 
-## 🗄️ Database Setup
-
-Run migrations:
-
-```bash
-npx prisma migrate dev
-```
-
-(Optional) Open Prisma Studio:
-
-```bash
-npx prisma studio
-```
-
----
-
-## ▶️ Running the Server
-
-### Development
-
-```bash
-npm run dev
-```
-
-### Production Build
-
-```bash
-npm run build
-npm start
-```
-
----
-
-## 🔐 Authentication APIs
+## 🔐 Authentication
 
 ### Register
 
@@ -115,10 +60,12 @@ npm start
 POST /auth/register
 ```
 
+**Body**
+
 ```json
 {
   "email": "user@example.com",
-  "password": "password123"
+  "password": "secret123"
 }
 ```
 
@@ -130,30 +77,19 @@ POST /auth/register
 POST /auth/login
 ```
 
-```json
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-Response:
+**Response**
 
 ```json
 {
-  "token": "JWT_TOKEN"
+  "token": "<jwt-token>"
 }
 ```
 
 ---
 
-## ✅ Todo APIs (Protected)
+## ✅ Todo APIs (Authenticated)
 
-All Todo routes require:
-
-```
-Authorization: Bearer <JWT_TOKEN>
-```
+All todo routes require a valid JWT token.
 
 ### Create Todo
 
@@ -162,15 +98,31 @@ POST /todos
 ```
 
 ```json
-{ "title": "Learn Prisma" }
+{
+  "title": "Finish backend"
+}
 ```
 
 ---
 
-### Get Todos
+### Get Todos (Pagination + Filtering)
 
 ```
-GET /todos
+GET /todos?page=1&limit=10&completed=false&search=backend
+```
+
+**Response**
+
+```json
+{
+  "items": [...],
+  "meta": {
+    "total": 42,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 5
+  }
+}
 ```
 
 ---
@@ -178,11 +130,13 @@ GET /todos
 ### Update Todo
 
 ```
-PUT /todos/:id
+PATCH /todos/:id
 ```
 
 ```json
-{ "completed": true }
+{
+  "completed": true
+}
 ```
 
 ---
@@ -195,7 +149,21 @@ DELETE /todos/:id
 
 ---
 
-## 🧪 Health Check
+## 🧪 Validation & Error Handling
+
+* **Zod** validates all request bodies and query params
+* **AppError** is used for all domain‑level failures
+* Global error middleware ensures consistent responses
+
+```json
+{
+  "message": "Todo not found"
+}
+```
+
+---
+
+## 🩺 Health Check
 
 ```
 GET /health/db
@@ -205,23 +173,58 @@ Checks database connectivity.
 
 ---
 
-## 🔒 Security Notes
+## ⚙️ Setup Instructions
 
-* Passwords are hashed using **bcrypt**
-* JWT is used for stateless authentication
-* User data is isolated by `userId`
-* `.env` is excluded from version control
+### 1️⃣ Install dependencies
+
+```bash
+npm install
+```
 
 ---
 
-## 🛣️ Roadmap / Improvements
+### 2️⃣ Configure environment variables
 
-* Input validation (Zod)
+Create a `.env` file:
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/todo_db
+JWT_SECRET=supersecret
+PORT=4000
+```
+
+---
+
+### 3️⃣ Run migrations
+
+```bash
+npx prisma migrate dev
+```
+
+---
+
+### 4️⃣ Start the server
+
+```bash
+npm run dev
+```
+
+---
+
+## 🧭 Future Improvements
+
+* Cursor‑based pagination
+* Role‑based access control
 * Refresh tokens
-* Pagination for todos
-* Unit & integration tests
-* Docker support
+* OpenAPI / Swagger docs
+* Integration tests
 
 ---
 
+## 📜 License
 
+MIT License
+
+---
+
+Built with care and strong typing ❤️
