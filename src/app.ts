@@ -5,6 +5,7 @@ import cors from "cors";
 import prisma from "./db/prisma";
 import authRoutes from "./routes/auth.routes";
 import todoRoutes from "./routes/todo.routes";
+import { errorHandler } from "./middlewares/error.middleware";
 
 
 
@@ -46,3 +47,5 @@ app.get("/health/db", async (req, res) => {
     });
   }
 });
+
+app.use(errorHandler);

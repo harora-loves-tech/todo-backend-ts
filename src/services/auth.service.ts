@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import prisma from "../db/prisma";
 import jwt from  "jsonwebtoken";
+import { AppError } from "../utils/app-error";
 
 
 export class AuthService {
@@ -12,7 +13,7 @@ export class AuthService {
     });
 
     if (existing) {
-      throw new Error("User already exists");
+      throw new AppError("User already exists", 400);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -34,13 +35,13 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error("Invalid credentials");
+      throw new AppError("Invalid credentials",401);
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      throw new Error("Invalid credentials");
+      throw new AppError("Invalid credentials",401);
     }
 
     const token = jwt.sign(

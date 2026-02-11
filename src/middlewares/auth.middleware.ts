@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { AppError } from "../utils/app-error";
 
 interface JwtPayload {
   userId: number;
@@ -13,13 +14,13 @@ export const authMiddleware = (
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({ message: "No token provided" });
+    return new AppError("No token provided", 401);
   }
 
   const token = authHeader.split(" ")[1];
 
   if (!token) {
-    return res.status(401).json({ message: "Invalid token format" });
+    return new AppError("Invalid token format", 401);
   }
 
   try {
@@ -33,6 +34,7 @@ export const authMiddleware = (
 
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+    return new AppError("IInvalid or expired token", 401);
+
   }
 };

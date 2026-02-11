@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { AuthService } from "../services/auth.service";
 import { registerSchema, loginSchema } from "../validators/auth.schema";
 
 const authService = new AuthService();
 
-export const register = async (req: Request, res: Response) => {
+export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = registerSchema.parse(req.body);
 
@@ -15,18 +15,12 @@ export const register = async (req: Request, res: Response) => {
       email: user.email
     });
   } catch (error: any) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({
-        errors: error.errors
-      });
-    }
-
-    res.status(400).json({ message: error.message });
+      next(error);
   }
 };
 
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
 
@@ -34,13 +28,7 @@ export const login = async (req: Request, res: Response) => {
 
     res.json({ token });
   } catch (error: any) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({
-        errors: error.errors
-      });
-    }
-
-    res.status(401).json({ message: error.message });
+    next(error)
   }
 };
 
